@@ -63,3 +63,10 @@ export const f = {
   uuid: () => z.string().uuid(),
   optUuid: () => z.preprocess((v) => (v === "" ? undefined : v), z.string().uuid().optional()),
 };
+
+export type Prev = ActionResult<unknown> | null;
+
+/** Same as `action` but for use inside an exported `async function` in a "use server" file. */
+export async function run<S extends z.ZodTypeAny, R = unknown>(fd: FormData, schema: S, fn: (input: z.infer<S>) => Promise<ActionResult<R> | void>): Promise<ActionResult<R>> {
+  return action(schema, (i) => fn(i))(null, fd);
+}
