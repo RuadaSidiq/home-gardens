@@ -8,13 +8,16 @@ import { setCurrency } from "@/app/(site)/actions";
 import { useRouter } from "next/navigation";
 
 export const NAV = [
-  { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/find-a-gardener", label: "Find a gardener" },
   { href: "/activities", label: "Activities" },
   { href: "/shop", label: "Shop" },
+];
+const MORE = [
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/become-a-gardener", label: "Become a gardener" },
 ];
 
 export function CurrencySwitcher({ value, compact }: { value: string; compact?: boolean }) {
@@ -53,9 +56,9 @@ export function HeaderNav({ cartCount, currency, user, unread, phone }: { cartCo
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/"));
   return (
     <>
-      <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
+      <nav aria-label="Main" className="hidden items-center gap-2 lg:flex">
         {NAV.map((n) => (
-          <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cn("rounded-md px-3 py-2 text-[15px] font-semibold transition-colors", isActive(n.href) ? "text-forest-600" : "text-ink hover:text-forest-600")}>
+          <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cn("rounded-md px-3.5 py-2 text-[15px] font-semibold transition-colors", isActive(n.href) ? "text-forest-600" : "text-ink hover:text-forest-600")}>
             {n.label}
           </Link>
         ))}
@@ -75,9 +78,8 @@ export function HeaderNav({ cartCount, currency, user, unread, phone }: { cartCo
         <Link href={user ? user.portal ?? "/account" : "/login"} className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-ink text-sm font-bold text-white hover:bg-forest-900" aria-label={user ? "My account" : "Sign in"} title={user ? user.name : "Sign in"}>
           {user ? user.name.trim()[0]!.toUpperCase() : <User className="h-[18px] w-[18px]" />}
         </Link>
-        <a href={`tel:${phone.replace(/\s/g, "")}`} className="ml-1 hidden items-center gap-2 xl:inline-flex">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-forest-600 text-white"><Phone className="h-[18px] w-[18px]" /></span>
-          <span className="text-[15px] font-semibold text-forest-600">{phone}</span>
+        <a href={`tel:${phone.replace(/\s/g, "")}`} className="ml-1 hidden h-10 w-10 items-center justify-center rounded-full bg-forest-600 text-white hover:bg-forest-700 sm:inline-flex" aria-label={`Call us on ${phone}`} title={phone}>
+          <Phone className="h-[18px] w-[18px]" />
         </a>
         <button type="button" onClick={() => setOpen((o) => !o)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-ink hover:bg-sand-100 lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label="Menu">
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -89,8 +91,9 @@ export function HeaderNav({ cartCount, currency, user, unread, phone }: { cartCo
             {NAV.map((n) => (
               <Link key={n.href} href={n.href} className={cn("border-b border-sand-100 py-3.5 text-lg font-medium", isActive(n.href) ? "text-forest-700" : "text-ink")}>{n.label}</Link>
             ))}
-            <Link href="/faq" className="border-b border-sand-100 py-3.5 text-lg font-medium">FAQ</Link>
-            <Link href="/become-a-gardener" className="border-b border-sand-100 py-3.5 text-lg font-medium">Become a gardener</Link>
+            {MORE.map((n) => (
+              <Link key={n.href} href={n.href} className={cn("border-b border-sand-100 py-3.5 text-lg font-medium", isActive(n.href) ? "text-forest-700" : "text-ink")}>{n.label}</Link>
+            ))}
             <div className="mt-6 flex items-center justify-between">
               <span className="text-sm text-ink-muted">Currency</span>
               <CurrencySwitcher value={currency} />
