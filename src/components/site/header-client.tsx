@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { Menu, X, ShoppingCart, User, ChevronDown, Bell, Phone } from "lucide-react";
+import { Menu, X, ShoppingCart, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setCurrency } from "@/app/(site)/actions";
 import { useRouter } from "next/navigation";
@@ -20,7 +20,7 @@ const MORE = [
   { href: "/become-a-gardener", label: "Become a gardener" },
 ];
 
-export function CurrencySwitcher({ value, compact }: { value: string; compact?: boolean }) {
+export function CurrencySwitcher({ value, compact, dark }: { value: string; compact?: boolean; dark?: boolean }) {
   const [pending, start] = useTransition();
   const router = useRouter();
   return (
@@ -37,16 +37,16 @@ export function CurrencySwitcher({ value, compact }: { value: string; compact?: 
             router.refresh();
           });
         }}
-        className="h-9 cursor-pointer appearance-none rounded-md border border-transparent bg-transparent pl-2 pr-6 text-[13px] font-semibold text-ink-soft hover:border-sand-200 focus:border-forest-500 focus:outline-none"
+        className={cn("h-9 cursor-pointer appearance-none rounded-md border bg-transparent pl-2.5 pr-7 text-[13px] font-semibold focus:border-forest-500 focus:outline-none", dark ? "border-forest-800 text-forest-100 hover:border-forest-600 [&>option]:text-ink" : "border-transparent text-ink-soft hover:border-sand-200")}
       >
         {["GHS", "USD", "GBP", "EUR", "NGN"].map((c) => <option key={c} value={c}>{c}</option>)}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-1.5 h-3.5 w-3.5 text-ink-muted" />
+      <ChevronDown className={cn("pointer-events-none absolute right-2 h-3.5 w-3.5", dark ? "text-forest-300" : "text-ink-muted")} />
     </label>
   );
 }
 
-export function HeaderNav({ cartCount, currency, user, unread, phone }: { cartCount: number; currency: string; user: { name: string; portal: string | null } | null; unread: number; phone: string }) {
+export function HeaderNav({ cartCount, currency, user, unread }: { cartCount: number; currency: string; user: { name: string; portal: string | null } | null; unread: number }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   useEffect(() => setOpen(false), [pathname]);
@@ -63,24 +63,19 @@ export function HeaderNav({ cartCount, currency, user, unread, phone }: { cartCo
           </Link>
         ))}
       </nav>
-      <div className="flex items-center gap-1">
-        <div className="hidden sm:block"><CurrencySwitcher value={currency} /></div>
-        {user && (
-          <Link href="/account/notifications" className="relative hidden h-9 w-9 items-center justify-center rounded-md text-ink-soft hover:bg-sand-100 sm:inline-flex" aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}>
-            <Bell className="h-[19px] w-[19px]" />
-            {unread > 0 && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-clay-500" />}
-          </Link>
-        )}
-        <Link href="/cart" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-ink-soft hover:bg-sand-100" aria-label={`Cart, ${cartCount} items`}>
-          <ShoppingCart className="h-[19px] w-[19px]" />
+      <div className="flex items-center gap-2">
+        <Link href="/cart" className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-sand-100" aria-label={`Cart, ${cartCount} items`}>
+          <ShoppingCart className="h-[20px] w-[20px]" />
           {cartCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-forest-600 px-1 text-[10px] font-bold text-white">{cartCount}</span>}
         </Link>
-        <Link href={user ? user.portal ?? "/account" : "/login"} className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-ink text-sm font-bold text-white hover:bg-forest-900" aria-label={user ? "My account" : "Sign in"} title={user ? user.name : "Sign in"}>
-          {user ? user.name.trim()[0]!.toUpperCase() : <User className="h-[18px] w-[18px]" />}
-        </Link>
-        <a href={`tel:${phone.replace(/\s/g, "")}`} className="ml-1 hidden h-10 w-10 items-center justify-center rounded-full bg-forest-600 text-white hover:bg-forest-700 sm:inline-flex" aria-label={`Call us on ${phone}`} title={phone}>
-          <Phone className="h-[18px] w-[18px]" />
-        </a>
+        {user ? (
+          <Link href={user.portal ?? "/account"} className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-forest-600 text-sm font-bold text-white hover:bg-forest-700" aria-label={`My account${unread ? `, ${unread} unread notifications` : ""}`} title={user.name}>
+            {user.name.trim()[0]!.toUpperCase()}
+            {unread > 0 && <span className="absolute right-0 top-0 h-2.5 w-2.5 rounded-full bg-clay-500 ring-2 ring-white" />}
+          </Link>
+        ) : (
+          <Link href="/login" className="hidden h-10 items-center rounded-full bg-forest-600 px-5 text-sm font-semibold text-white hover:bg-forest-700 sm:inline-flex">Sign in</Link>
+        )}
         <button type="button" onClick={() => setOpen((o) => !o)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-ink hover:bg-sand-100 lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label="Menu">
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>

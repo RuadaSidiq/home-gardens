@@ -3,6 +3,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { getSiteContext, serviceCategoriesNav } from "@/server/site";
 import { Logo } from "./logo";
 import { NewsletterForm } from "./newsletter";
+import { CurrencySwitcher } from "./header-client";
 
 const social = {
   facebook: "M14 8h3V4h-3c-2.8 0-5 2.2-5 5v2H7v4h2v9h4v-9h3l1-4h-4V9c0-.6.4-1 1-1Z",
@@ -12,7 +13,7 @@ const social = {
 };
 
 export async function SiteFooter() {
-  const [{ settings }, cats] = await Promise.all([getSiteContext(), serviceCategoriesNav()]);
+  const [{ settings, currency }, cats] = await Promise.all([getSiteContext(), serviceCategoriesNav()]);
   const c = settings.company;
   const socials = (Object.entries(settings.social) as [keyof typeof social, string][]).filter(([, url]) => url);
   return (
@@ -74,7 +75,10 @@ export async function SiteFooter() {
       <div className="border-t border-forest-900">
         <div className="container flex flex-col gap-2 py-5 text-xs text-forest-300 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {c.legalName}. All rights reserved.</p>
-          <p>Payments by Mobile Money, card and bank transfer.</p>
+          <div className="flex items-center gap-4">
+            <p>Payments by Mobile Money, card and bank transfer.</p>
+            <CurrencySwitcher value={currency} dark />
+          </div>
         </div>
       </div>
     </footer>
