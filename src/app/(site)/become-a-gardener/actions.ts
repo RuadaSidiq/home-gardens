@@ -48,7 +48,7 @@ export async function applyAsGardener(_: Prev, fd: FormData) {
     const idDoc = fd.get("idDocument") as File | null;
     if (!idDoc || idDoc.size === 0) throw new UserError("Upload an identity document.", "idDocument");
 
-    let user = await getCurrentUser();
+    const user = await getCurrentUser();
     let userId: string;
     if (user) {
       if (user.gardenerId) throw new UserError("You already have a gardener profile.");

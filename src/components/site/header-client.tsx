@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { Menu, X, ShoppingCart, User, ChevronDown, Bell } from "lucide-react";
+import { Menu, X, ShoppingCart, User, ChevronDown, Bell, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setCurrency } from "@/app/(site)/actions";
 import { useRouter } from "next/navigation";
 
 export const NAV = [
+  { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/find-a-gardener", label: "Find a gardener" },
   { href: "/activities", label: "Activities" },
@@ -42,19 +43,19 @@ export function CurrencySwitcher({ value, compact }: { value: string; compact?: 
   );
 }
 
-export function HeaderNav({ cartCount, currency, user, unread }: { cartCount: number; currency: string; user: { name: string; portal: string | null } | null; unread: number }) {
+export function HeaderNav({ cartCount, currency, user, unread, phone }: { cartCount: number; currency: string; user: { name: string; portal: string | null } | null; unread: number; phone: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
   }, [open]);
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/"));
   return (
     <>
       <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
         {NAV.map((n) => (
-          <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cn("rounded-md px-3 py-2 text-[14.5px] font-medium transition-colors", isActive(n.href) ? "text-forest-700" : "text-ink-soft hover:text-ink")}>
+          <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cn("rounded-md px-3 py-2 text-[15px] font-semibold transition-colors", isActive(n.href) ? "text-forest-600" : "text-ink hover:text-forest-600")}>
             {n.label}
           </Link>
         ))}
@@ -71,22 +72,19 @@ export function HeaderNav({ cartCount, currency, user, unread }: { cartCount: nu
           <ShoppingCart className="h-[19px] w-[19px]" />
           {cartCount > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-forest-600 px-1 text-[10px] font-bold text-white">{cartCount}</span>}
         </Link>
-        {user ? (
-          <Link href={user.portal ?? "/account"} className="ml-1 hidden h-9 items-center gap-2 rounded-md border border-sand-200 px-3 text-sm font-semibold hover:bg-sand-50 sm:inline-flex">
-            <User className="h-4 w-4" /> <span className="max-w-[9rem] truncate">{user.name.split(" ")[0]}</span>
-          </Link>
-        ) : (
-          <div className="ml-1 hidden items-center gap-1 sm:flex">
-            <Link href="/login" className="rounded-md px-3 py-2 text-sm font-semibold text-ink-soft hover:text-ink">Sign in</Link>
-            <Link href="/services" className="inline-flex h-9 items-center rounded-md bg-forest-600 px-4 text-sm font-semibold text-white hover:bg-forest-700">Book a gardener</Link>
-          </div>
-        )}
+        <Link href={user ? user.portal ?? "/account" : "/login"} className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-ink text-sm font-bold text-white hover:bg-forest-900" aria-label={user ? "My account" : "Sign in"} title={user ? user.name : "Sign in"}>
+          {user ? user.name.trim()[0]!.toUpperCase() : <User className="h-[18px] w-[18px]" />}
+        </Link>
+        <a href={`tel:${phone.replace(/\s/g, "")}`} className="ml-1 hidden items-center gap-2 xl:inline-flex">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-forest-600 text-white"><Phone className="h-[18px] w-[18px]" /></span>
+          <span className="text-[15px] font-semibold text-forest-600">{phone}</span>
+        </a>
         <button type="button" onClick={() => setOpen((o) => !o)} className="inline-flex h-9 w-9 items-center justify-center rounded-md text-ink hover:bg-sand-100 lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label="Menu">
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
       {open && (
-        <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto border-t border-sand-200 bg-white lg:hidden">
+        <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-[76px] z-40 overflow-y-auto border-t border-sand-200 bg-white lg:hidden">
           <nav aria-label="Mobile" className="container flex flex-col py-4">
             {NAV.map((n) => (
               <Link key={n.href} href={n.href} className={cn("border-b border-sand-100 py-3.5 text-lg font-medium", isActive(n.href) ? "text-forest-700" : "text-ink")}>{n.label}</Link>

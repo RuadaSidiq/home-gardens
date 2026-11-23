@@ -36,7 +36,7 @@ export function CheckoutForm({ currency, lines, addresses, countries, cities, by
   }, [addressId, addresses]);
 
   const methods = useMemo(() => (cityId ? byCountry[country]?.methods[cityId] ?? [] : []), [byCountry, country, cityId]);
-  const providers = byCountry[country]?.providers ?? [];
+  const providers = useMemo(() => byCountry[country]?.providers ?? [], [byCountry, country]);
   useEffect(() => { if (!methods.some((m) => m.id === methodId)) setMethodId(methods[0]?.id ?? ""); }, [methods, methodId]);
   useEffect(() => { if (!providers.some((p) => p.key === provider)) setProvider(providers[0]?.key ?? ""); }, [providers, provider]);
 

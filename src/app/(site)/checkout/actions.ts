@@ -49,7 +49,7 @@ export async function placeOrder(_: Prev, fd: FormData) {
     let url: string;
     try {
       url = (await initiatePayment({ purpose: "order", subjectId: order.id, userId: user.id, email: user.email, provider: i.provider })).url;
-    } catch (e) {
+    } catch {
       // order exists with stock reserved; send the customer to it to retry payment
       redirect(`/account/orders/${order.id}?payment=error`);
     }

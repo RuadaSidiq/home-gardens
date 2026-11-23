@@ -29,7 +29,7 @@ export function ProductCard({ product, price, salePrice, brand, stock, currency 
   const out = stock != null && stock <= 0;
   return (
     <Link href={`/shop/${product.slug}`} className="group flex flex-col">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-sand-100">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] rounded-br-[40px] bg-sand-100">
         {img && <Image src={img} alt={product.name} fill sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />}
         <div className="absolute left-2.5 top-2.5 flex flex-col gap-1">
           {salePrice != null && <span className="rounded-sm bg-clay-600 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">Sale</span>}
@@ -52,7 +52,7 @@ export function ProductCard({ product, price, salePrice, brand, stock, currency 
 type GardenerLike = { g: { slug: string; headline: string; yearsExperience: number; type: "company" | "independent"; ratingAvg: string; ratingCount: number; verifiedAt: Date | null; hourlyRate: number | null; currency: string; jobsCompleted: number }; name: string; avatar: string | null; city: string | null; specialties?: string[] };
 export function GardenerCard({ gardener: r, compact }: { gardener: GardenerLike; compact?: boolean }) {
   return (
-    <Link href={`/gardeners/${r.g.slug}`} className="group flex flex-col overflow-hidden rounded-lg border border-sand-200 bg-white transition-shadow hover:shadow-pop">
+    <Link href={`/gardeners/${r.g.slug}`} className="group flex flex-col overflow-hidden rounded-[22px] rounded-br-[48px] border border-sand-200 bg-white transition-shadow hover:shadow-pop">
       <div className={cn("relative overflow-hidden bg-sand-100", compact ? "aspect-[4/3]" : "aspect-[5/4]")}>
         {r.avatar && <Image src={r.avatar} alt={r.name} fill sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" />}
         <span className={cn("absolute left-3 top-3 rounded-sm px-2 py-0.5 text-[11px] font-semibold", r.g.type === "company" ? "bg-forest-700 text-white" : "bg-white text-ink")}>

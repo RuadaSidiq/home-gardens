@@ -10,10 +10,10 @@ export async function SiteHeader() {
       {ctx.announcement && (
         <div className="bg-forest-900 px-4 py-2 text-center text-[13px] font-medium text-forest-50">{ctx.announcement}</div>
       )}
-      <header className="sticky top-0 z-40 border-b border-sand-200/80 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85">
-        <div className="container flex h-16 items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
+        <div className="container flex h-[76px] items-center justify-between gap-4">
           <Logo name={ctx.settings.company.name} />
-          <HeaderNav cartCount={ctx.cartCount} currency={ctx.currency} unread={ctx.unread} user={ctx.user ? { name: ctx.user.fullName, portal } : null} />
+          <HeaderNav cartCount={ctx.cartCount} currency={ctx.currency} unread={ctx.unread} phone={ctx.settings.company.phone} user={ctx.user ? { name: ctx.user.fullName, portal } : null} />
         </div>
       </header>
     </>

@@ -605,7 +605,7 @@ export async function rescheduleBooking(opts: { bookingId: string; actorId: stri
       const end = new Date(start.getTime() + duration);
       const lead = (start.getTime() - Date.now()) / 3600_000;
       if (lead < (opts.byCustomer ? settings.booking.minLeadHours : 0)) throw new UserError(`Choose a time at least ${settings.booking.minLeadHours} hours from now.`, "date");
-      let patch: Partial<typeof schema.bookings.$inferInsert> = { scheduledStart: start, scheduledEnd: end, rescheduleCount: b.rescheduleCount + 1, updatedAt: new Date() };
+      const patch: Partial<typeof schema.bookings.$inferInsert> = { scheduledStart: start, scheduledEnd: end, rescheduleCount: b.rescheduleCount + 1, updatedAt: new Date() };
       if (b.gardenerId && (b.status === "assigned" || b.status === "accepted")) {
         const free = await eligibleGardeners({ serviceId: b.serviceId, cityId: b.cityId, start, end, timeZone: tz, onlyGardenerId: b.gardenerId, excludeBookingId: b.id }, tx);
         if (!free.length) {

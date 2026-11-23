@@ -10,7 +10,7 @@
  * No transactions, payments, reviews or ratings are fabricated.
  */
 import "dotenv/config";
-import { eq } from "drizzle-orm";
+
 import { db, schema, sqlClient } from "../src/db";
 import { PERMISSIONS, DEFAULT_ROLES } from "../src/server/auth/permissions";
 import { DEFAULT_TEMPLATES } from "../src/server/notify/templates";
@@ -441,7 +441,7 @@ async function main() {
 
   /* ---------------- CMS ---------------- */
   await db.insert(schema.websiteContent).values([
-    { key: "home.hero", value: { eyebrow: "Garden care in Accra & Kumasi", title: "Gardeners you can trust, supplies you can rely on", subtitle: "Book vetted gardeners for lawn care, landscaping and maintenance, shop tools and plants, and join workshops – all from one account.", image: P(5529587), primaryLabel: "Book a gardener", secondaryLabel: "Shop supplies" } },
+    { key: "home.hero", value: { eyebrow: "Home Gardens", title: "We take care of your home garden", subtitle: "We design, maintain and care for gardens across Accra and Kumasi – with vetted gardeners, clear prices and supplies delivered to your door.", image: P(5529587), primaryLabel: "Our services", secondaryLabel: "Shop supplies" } },
     { key: "home.promo", value: { title: "Rainy season lawn plan", body: "Book three fortnightly mowing visits and get your fertilizer application free. Available in Greater Accra until the end of the season.", image: U("1558904541-efa843a96f01"), ctaLabel: "See lawn services", ctaHref: "/services?category=lawn-care", active: true } },
     { key: "site.announcement", value: { text: "Free delivery in Greater Accra on shop orders over GH₵1,000", active: true } },
     { key: "seo.default", value: { title: "Home Gardens – Gardeners, garden supplies and workshops in Ghana", description: "Book vetted gardeners for lawn care, landscaping, pruning and irrigation, buy gardening tools and plants, and register for garden workshops in Accra and Kumasi." } },
