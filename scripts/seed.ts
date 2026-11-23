@@ -385,6 +385,51 @@ async function main() {
     { zoneId: zNg!.id, name: "International courier (5–10 days)", type: "weight", price: ghs(450), pricePerKg: ghs(45), currency: "GHS", minDays: 5, maxDays: 10 },
   ]);
 
+
+  /* ---------------- CMS ---------------- */
+  await db.insert(schema.websiteContent).values([
+    { key: "home.hero", value: { eyebrow: "Home Gardens", title: "We take care of your home garden", subtitle: "We design, maintain and care for gardens across Accra and Kumasi – with vetted gardeners, clear prices and supplies delivered to your door.", image: P(5529587), primaryLabel: "Our services", secondaryLabel: "Shop supplies" } },
+    { key: "home.promo", value: { title: "Rainy season lawn plan", body: "Book three fortnightly mowing visits and get your fertilizer application free. Available in Greater Accra until the end of the season.", image: U("1558904541-efa843a96f01"), ctaLabel: "See lawn services", ctaHref: "/services?category=lawn-care", active: !minimal } },
+    { key: "site.announcement", value: { text: "Free delivery in Greater Accra on shop orders over GH₵1,000", active: true } },
+    { key: "seo.default", value: { title: "Home Gardens – Gardeners, garden supplies and workshops in Ghana", description: "Book vetted gardeners for lawn care, landscaping, pruning and irrigation, buy gardening tools and plants, and register for garden workshops in Accra and Kumasi." } },
+  ]);
+  await db.insert(schema.faqs).values([
+    { category: "Bookings", question: "How do I know what a service will cost?", answer: "Fixed and area-based services show the price before you book. Larger jobs such as landscaping or irrigation are quoted after you share photos or after a site inspection – you only pay once you accept the quote.", sort: 1 },
+    { category: "Bookings", question: "Can I choose my gardener?", answer: "Yes. You can pick a specific gardener when booking, or let us match you with the best available gardener for the service, location and time.", sort: 2 },
+    { category: "Bookings", question: "What is your cancellation policy?", answer: "Cancel at least 24 hours before your booking for a full refund. Later cancellations keep 20% of the booking value to cover the gardener's reserved time.", sort: 3 },
+    { category: "Bookings", question: "What if I'm not happy with the work?", answer: "When your gardener marks a job complete you'll see their photos. If something is not right, choose 'Report a problem' instead of confirming and our support team will step in before any payment is released to the gardener.", sort: 4 },
+    { category: "Payments", question: "Which payment methods do you accept?", answer: "In Ghana you can pay with Mobile Money (MTN, Telecel, AirtelTigo) and cards through our payment partners, or by bank transfer. International customers can pay by card or PayPal where available.", sort: 5 },
+    { category: "Payments", question: "Do I pay everything upfront?", answer: "Some services take a deposit when you book and the balance before you confirm completion. The amount due is always shown before you pay.", sort: 6 },
+    { category: "Shop", question: "Where do you deliver?", answer: "We deliver across Greater Accra and Kumasi within 1–3 days, to other Ghanaian cities by courier, and to Nigeria by international courier. Live plants and seedlings are delivered in Greater Accra only.", sort: 7 },
+    { category: "Shop", question: "Can I return a product?", answer: "Unused products can be returned within 14 days of delivery. Request a return from your order page and we'll arrange collection.", sort: 8 },
+    { category: "Gardeners", question: "How are gardeners vetted?", answer: "Independent gardeners submit identity documents, experience and portfolio photos. Our team verifies documents and reviews each application before the profile goes live. Company gardeners are employed and trained by us.", sort: 9 },
+    { category: "Gardeners", question: "How do independent gardeners get paid?", answer: "Earnings from completed jobs, less the platform commission, become available after a short holding period. Gardeners request payouts to Mobile Money or a bank account from their dashboard.", sort: 10 },
+  ]);
+  await db.insert(schema.pages).values([
+    { slug: "terms", title: "Terms of service", body: "These terms govern use of the Home Gardens website and services.\n\n## Bookings\nA booking is confirmed once the required payment is received. Prices shown include applicable taxes unless stated otherwise.\n\n## Cancellations\nCancellations made at least 24 hours before the scheduled start receive a full refund. Later cancellations incur a fee of 20% of the booking value.\n\n## Shop orders\nOrders are dispatched once payment is confirmed. Unused items may be returned within 14 days of delivery.\n\n## Independent gardeners\nIndependent gardeners are self-employed service providers who agree to our gardener terms, including our commission and payout schedule.\n\n*Replace this page with terms reviewed by your legal adviser before launch.*" },
+    { slug: "privacy", title: "Privacy policy", body: "We collect the information needed to provide our services: your contact details, addresses, booking and order history, and payment records. Identity documents submitted by gardeners are stored privately and only accessible to authorised staff.\n\nWe never store full card details – payments are processed by our payment partners.\n\nYou can request a copy or deletion of your data by contacting us.\n\n*Replace this page with a policy reviewed against the Ghana Data Protection Act, 2012 (Act 843) and any other laws that apply to you before launch.*" },
+  ]);
+  await db.insert(schema.systemSettings).values([{ key: "company", value: { name: "Home Gardens" } }]);
+
+  console.log("Reference data seeded.");
+  if (minimal) {
+    await createAdmin(roleId("super_admin"));
+    return;
+  }
+
+  /* ================================================================= */
+  /* Demo content                                                       */
+  /* ================================================================= */
+  const pw = await hashPassword(process.env.SEED_DEMO_PASSWORD || "Garden2026!");
+  const mkUser = async (email: string, fullName: string, role: string, extra: Partial<typeof schema.users.$inferInsert> = {}) => {
+    const [u] = await db
+      .insert(schema.users)
+      .values({ email, fullName, passwordHash: pw, countryCode: "GH", preferredCurrency: "GHS", emailVerifiedAt: new Date(), phone: "+233 24 000 0000", ...extra })
+      .returning();
+    await db.insert(schema.userRoles).values({ userId: u!.id, roleId: roleId(role) });
+    return u!;
+  };
+
   await db.insert(schema.coupons).values([
     { code: "WELCOME10", description: "10% off your first shop order", type: "percent", value: 10, scope: "products", perUserLimit: 1 },
     { code: "GARDEN50", description: "GH₵50 off services over GH₵300", type: "fixed", value: ghs(50), currency: "GHS", scope: "services", minSubtotal: ghs(300), perUserLimit: 1, maxUses: 500 },
@@ -439,49 +484,6 @@ async function main() {
     await db.insert(schema.activitySessions).values(sessions);
   }
 
-  /* ---------------- CMS ---------------- */
-  await db.insert(schema.websiteContent).values([
-    { key: "home.hero", value: { eyebrow: "Home Gardens", title: "We take care of your home garden", subtitle: "We design, maintain and care for gardens across Accra and Kumasi – with vetted gardeners, clear prices and supplies delivered to your door.", image: P(5529587), primaryLabel: "Our services", secondaryLabel: "Shop supplies" } },
-    { key: "home.promo", value: { title: "Rainy season lawn plan", body: "Book three fortnightly mowing visits and get your fertilizer application free. Available in Greater Accra until the end of the season.", image: U("1558904541-efa843a96f01"), ctaLabel: "See lawn services", ctaHref: "/services?category=lawn-care", active: true } },
-    { key: "site.announcement", value: { text: "Free delivery in Greater Accra on shop orders over GH₵1,000", active: true } },
-    { key: "seo.default", value: { title: "Home Gardens – Gardeners, garden supplies and workshops in Ghana", description: "Book vetted gardeners for lawn care, landscaping, pruning and irrigation, buy gardening tools and plants, and register for garden workshops in Accra and Kumasi." } },
-  ]);
-  await db.insert(schema.faqs).values([
-    { category: "Bookings", question: "How do I know what a service will cost?", answer: "Fixed and area-based services show the price before you book. Larger jobs such as landscaping or irrigation are quoted after you share photos or after a site inspection – you only pay once you accept the quote.", sort: 1 },
-    { category: "Bookings", question: "Can I choose my gardener?", answer: "Yes. You can pick a specific gardener when booking, or let us match you with the best available gardener for the service, location and time.", sort: 2 },
-    { category: "Bookings", question: "What is your cancellation policy?", answer: "Cancel at least 24 hours before your booking for a full refund. Later cancellations keep 20% of the booking value to cover the gardener's reserved time.", sort: 3 },
-    { category: "Bookings", question: "What if I'm not happy with the work?", answer: "When your gardener marks a job complete you'll see their photos. If something is not right, choose 'Report a problem' instead of confirming and our support team will step in before any payment is released to the gardener.", sort: 4 },
-    { category: "Payments", question: "Which payment methods do you accept?", answer: "In Ghana you can pay with Mobile Money (MTN, Telecel, AirtelTigo) and cards through our payment partners, or by bank transfer. International customers can pay by card or PayPal where available.", sort: 5 },
-    { category: "Payments", question: "Do I pay everything upfront?", answer: "Some services take a deposit when you book and the balance before you confirm completion. The amount due is always shown before you pay.", sort: 6 },
-    { category: "Shop", question: "Where do you deliver?", answer: "We deliver across Greater Accra and Kumasi within 1–3 days, to other Ghanaian cities by courier, and to Nigeria by international courier. Live plants and seedlings are delivered in Greater Accra only.", sort: 7 },
-    { category: "Shop", question: "Can I return a product?", answer: "Unused products can be returned within 14 days of delivery. Request a return from your order page and we'll arrange collection.", sort: 8 },
-    { category: "Gardeners", question: "How are gardeners vetted?", answer: "Independent gardeners submit identity documents, experience and portfolio photos. Our team verifies documents and reviews each application before the profile goes live. Company gardeners are employed and trained by us.", sort: 9 },
-    { category: "Gardeners", question: "How do independent gardeners get paid?", answer: "Earnings from completed jobs, less the platform commission, become available after a short holding period. Gardeners request payouts to Mobile Money or a bank account from their dashboard.", sort: 10 },
-  ]);
-  await db.insert(schema.pages).values([
-    { slug: "terms", title: "Terms of service", body: "These terms govern use of the Home Gardens website and services.\n\n## Bookings\nA booking is confirmed once the required payment is received. Prices shown include applicable taxes unless stated otherwise.\n\n## Cancellations\nCancellations made at least 24 hours before the scheduled start receive a full refund. Later cancellations incur a fee of 20% of the booking value.\n\n## Shop orders\nOrders are dispatched once payment is confirmed. Unused items may be returned within 14 days of delivery.\n\n## Independent gardeners\nIndependent gardeners are self-employed service providers who agree to our gardener terms, including our commission and payout schedule.\n\n*Replace this page with terms reviewed by your legal adviser before launch.*" },
-    { slug: "privacy", title: "Privacy policy", body: "We collect the information needed to provide our services: your contact details, addresses, booking and order history, and payment records. Identity documents submitted by gardeners are stored privately and only accessible to authorised staff.\n\nWe never store full card details – payments are processed by our payment partners.\n\nYou can request a copy or deletion of your data by contacting us.\n\n*Replace this page with a policy reviewed against the Ghana Data Protection Act, 2012 (Act 843) and any other laws that apply to you before launch.*" },
-  ]);
-  await db.insert(schema.systemSettings).values([{ key: "company", value: { name: "Home Gardens" } }]);
-
-  console.log("Reference data seeded.");
-  if (minimal) {
-    await createAdmin(roleId("super_admin"));
-    return;
-  }
-
-  /* ================================================================= */
-  /* Demo content                                                       */
-  /* ================================================================= */
-  const pw = await hashPassword(process.env.SEED_DEMO_PASSWORD || "Garden2026!");
-  const mkUser = async (email: string, fullName: string, role: string, extra: Partial<typeof schema.users.$inferInsert> = {}) => {
-    const [u] = await db
-      .insert(schema.users)
-      .values({ email, fullName, passwordHash: pw, countryCode: "GH", preferredCurrency: "GHS", emailVerifiedAt: new Date(), phone: "+233 24 000 0000", ...extra })
-      .returning();
-    await db.insert(schema.userRoles).values({ userId: u!.id, roleId: roleId(role) });
-    return u!;
-  };
 
   const admin = await mkUser("admin@homegardens.example", "Esi Owusu", "super_admin");
   await db.insert(schema.staffProfiles).values({ userId: admin.id, employeeId: "HG-0001", department: "Management", jobTitle: "Operations director" });

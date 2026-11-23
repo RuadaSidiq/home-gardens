@@ -1384,6 +1384,13 @@ export const auditLogs = pgTable(
   (t) => [index("audit_entity_idx").on(t.entityType, t.entityId), index("audit_created_idx").on(t.createdAt)],
 );
 
+/** File contents when STORAGE_DRIVER=db (serverless hosts without a persistent disk). */
+export const fileBlobs = pgTable("file_blobs", {
+  key: text("key").primaryKey(),
+  data: text("data").notNull(), // base64
+  createdAt: createdAt(),
+});
+
 export const aiUsage = pgTable("ai_usage", {
   id: id(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),

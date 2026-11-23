@@ -15,6 +15,13 @@
       "when": 1795377700017,
       "tag": "0001_constraints",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795394438376,
+      "tag": "0002_file_blobs",
+      "breakpoints": true
     }
   ]
 }

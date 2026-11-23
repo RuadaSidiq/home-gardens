@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { UserError } from "./errors";
 
@@ -32,7 +33,7 @@ function s3() {
     credentials: { accessKeyId: process.env.S3_ACCESS_KEY_ID!, secretAccessKey: process.env.S3_SECRET_ACCESS_KEY! },
   });
 }
-const driver = () => (process.env.STORAGE_DRIVER === "s3" ? "s3" : "local");
+const driver = () => (process.env.STORAGE_DRIVER === "s3" ? "s3" : process.env.STORAGE_DRIVER === "db" ? "db" : "local");
 
 export type StoredFile = { id: string; url: string; key: string; mime: string };
 
@@ -57,6 +58,8 @@ export async function storeUpload(
   if (driver() === "s3") {
     const bucket = opts.visibility === "public" ? process.env.S3_BUCKET_PUBLIC! : process.env.S3_BUCKET_PRIVATE!;
     await s3().send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: buf, ContentType: mime }));
+  } else if (driver() === "db") {
+    await db.insert(schema.fileBlobs).values({ key, data: buf.toString("base64") });
   } else {
     const full = path.join(LOCAL_ROOT, key);
     await mkdir(path.dirname(full), { recursive: true });
@@ -82,6 +85,10 @@ export async function readStored(key: string, visibility: "public" | "private"):
       const bucket = visibility === "public" ? process.env.S3_BUCKET_PUBLIC! : process.env.S3_BUCKET_PRIVATE!;
       const res = await s3().send(new GetObjectCommand({ Bucket: bucket, Key: key }));
       return Buffer.from(await res.Body!.transformToByteArray());
+    }
+    if (driver() === "db") {
+      const [row] = await db.select().from(schema.fileBlobs).where(eq(schema.fileBlobs.key, key));
+      return row ? Buffer.from(row.data, "base64") : null;
     }
     return await readFile(path.join(LOCAL_ROOT, key));
   } catch {
