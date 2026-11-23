@@ -44,6 +44,7 @@ export default async function HomePage() {
             <p className="mt-6 text-[17px] leading-relaxed text-ink-soft">{hero.subtitle}</p>
             <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-6">
               <PillLink href="/services">{hero.primaryLabel || "Our services"}</PillLink>
+              {(stats.reviewCount > 0 || stats.verifiedGardeners > 0) && (
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-3">
                   {gardeners.slice(0, 3).map((g) => g.avatar && <Image key={g.g.id} src={g.avatar} alt="" width={44} height={44} className="h-11 w-11 rounded-full border-2 border-white object-cover object-top" />)}
@@ -60,6 +61,7 @@ export default async function HomePage() {
                   </div>
                 )}
               </div>
+              )}
             </div>
             <p className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-soft">
               <Link href="/shop" className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-forest-600">{hero.secondaryLabel || "Shop supplies"} <ArrowRight className="h-4 w-4" /></Link>
