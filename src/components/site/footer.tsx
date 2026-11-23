@@ -74,7 +74,7 @@ export async function SiteFooter() {
       </div>
       <div className="border-t border-forest-900">
         <div className="container flex flex-col gap-2 py-5 text-xs text-forest-300 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} {c.legalName}. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {c.legalName.replace(/\.$/, "")}. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <p>Payments by Mobile Money, card and bank transfer.</p>
             <CurrencySwitcher value={currency} dark />
