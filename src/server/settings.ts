@@ -25,7 +25,7 @@ export const DEFAULT_SETTINGS: Settings = {
   company: {
     name: "Home Gardens",
     legalName: "Home Gardens Ltd.",
-    email: "hello@homegardens.com",
+    email: "hello@homgardens.com",
     phone: "+233 55 110 8347",
     whatsapp: "+233 55 110 8347",
     address: "East Legon, Accra, Ghana",
